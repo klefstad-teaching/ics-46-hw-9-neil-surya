@@ -1,41 +1,52 @@
+#include "dijkstras.h"
 #include <iostream>
 #include <vector>
-#include <algorithms>
+#include <stack>
+#include <queue>
+#include <limits>
+#include <fstream>
+using namespace std;
 
 vector<int> dijkstra_shortest_path(const Graph& G, int source, vector<int>& previous) {
-    vector<int> distances(G.numVertices, INF);
-    previous.resize(G.numVertices, -1);
-    distances[source] = 0;
+    int n = G.size();
+    vector<int> distance(n, INF);
+    distance[source] = 0;
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
     pq.push({0, source});
-    vector<bool> visited(G.numVertices, false);
     while (!pq.empty()) {
         int u = pq.top().second;
         pq.pop();
-        if (visited[u]) continue;
-        for (const Edge& e : G[u] {
+        for (const Edge& e : G[u]) {
             int v = e.dst;
-            int w = e.weight;
-            if (!visited[v] && distances[u] != INF && distances[u] + w < distances[v]) {
-                distances[v] = distances[u] + w;
+            int weight = e.weight;
+            if (distance[u] + weight < distance[v]) {
+                distance[v] = distance[u] + weight;
                 previous[v] = u;
-                pq.push({distances[v], v});
+                pq.push({distance[v], v});
             }
-        })
+        }
     }
-    return distances;
+    return distance;
 }
 vector<int> extract_shortest_path(const vector<int>& /*distances*/, const vector<int>& previous, int destination) {
+    stack<int> s;
     vector<int> path;
-    for (int v = destination; v != -1; v = previous[v]) {
-        path.push_back(v);
+    for (int v = destination; v != -1; v = previous[v])
+        s.push(v);
+    while (!s.empty()) {
+        path.push_back(s.top());
+        s.pop();
     }
-    reverse(path.begin(), path.end());
     return path;
 }
 void print_path(const vector<int>& v, int total) {
+    if (total == INF) {
+        cout << "No path found!" << endl;
+        return;
+    }
     cout << "Path: ";
     for (auto e: v)
         cout << e << " ";
+    cout << endl;
     cout << "Total cost is " << total << endl;
 }

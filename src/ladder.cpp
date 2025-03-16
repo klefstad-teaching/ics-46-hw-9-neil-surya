@@ -1,7 +1,9 @@
+#include "ladder.h"
 #include <vector>
 #include <string>
 #include <iostream>
 #include <set>
+using namespace std;
 
 void error(string word1, string word2, string msg) {
     cout << "Error with " << word1 << " and " << word2 << ": " << msg << endl;
@@ -13,7 +15,7 @@ bool edit_distance_within(const std::string& str1, const std::string& str2, int 
     return is_adjacent(str1, str2);
 }
 bool is_adjacent(const string& word1, const string& word2) {
-    if (abs((int)str1.length() - (int)str2.length()) > 1) {
+    if (abs((int)word1.length() - (int)word2.length()) > 1) {
         return false;
     }
 
