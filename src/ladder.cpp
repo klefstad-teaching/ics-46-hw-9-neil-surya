@@ -6,8 +6,45 @@
 void error(string word1, string word2, string msg) {
     cout << "Error with " << word1 << " and " << word2 << ": " << msg << endl;
 }
-bool edit_distance_within(const std::string& str1, const std::string& str2, int d);
-bool is_adjacent(const string& word1, const string& word2);
+bool edit_distance_within(const std::string& str1, const std::string& str2, int d) {
+    if (abs((int)str1.length() - (int)str2.length()) > d) {
+        return false;
+    }
+    int lgr = (int)str1.length() > (int)str2.length()
+}
+bool is_adjacent(const string& word1, const string& word2) {
+    if (abs((int)str1.length() - (int)str2.length()) > 1) {
+        return false;
+    }
+
+    // same length 1 diff character
+    if (word1.length() == word2.length()) {
+        int diff_count = 0;
+        for(size_t i = 0; i < word1.length(); ++i) {
+            if (word1[i] != word2[i]) ++diff_count;
+            if (diff_count > 1) return false;
+        }
+        return diff_count == 1;
+    }
+
+    // diff length by 1
+    const string& shorter = (word1.length() < word2.length()) ? word1 : word2;
+    const string& longer = (word1.length() < word2.length()) ? word2 : word1;
+
+    for (size_t i = 0; i < longer.length(); ++i) {
+        string test = longer;
+        test.erase(i, 1);
+        if (test == shorter) return true;
+    }
+
+    return false;
+}
+vector<string> get_patterns(const string& word, const set<string>& word_list) {
+    vector<string> result;
+    for (const string& w : word_list)
+        if (is_adjacent(word, w)) result.push_back(w);
+    return result;
+}
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
     // initial edge checks
     if (begin_word == end_word) {
@@ -17,24 +54,57 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
         error(end_word, "", "End word not in the dictionary!");
         return {};
     }
-
     vector<string> curr;
     queue<vector<string>> partial;
     partial.push({begin_word});
     set<string> visited;
     visited.insert(begin_word);
-
     // bfs time
     while (!partial.empty()) {
         curr = partial.front();
         partial.pop();
         string last = curr.back();
-
+        vector<string> possible = get_patterns(last, word_list);
+        for (auto const& word : possible) {
+            if (visited.find(word) == visited.end()) {
+                visited.insert(word);
+                vector<string> new_ladder = curr;
+                new_ladder.push_back(word);
+                if (word == end_word) return new_ladder;
+                partial.push(new_ladder);
+            }
+        }
     }
-
     error(begin_word, end_word, "No valid word ladder found!");
     return {};
 }
-void load_words(set<string> & word_list, const string& file_name);
-void print_word_ladder(const vector<string>& ladder);
-void verify_word_ladder();
+void load_words(set<string> & word_list, const string& file_name) {
+    ifstream f(file_name);
+    if (!f.is_open()) {
+        cout << "Error: Could not open file: " << file_name << endl;
+        return;
+    }
+
+    string word;
+    while (f >> word) {
+        word_list.insert(word);
+    }
+    f.close();
+}
+void print_word_ladder(const vector<string>& ladder) {
+    if (ladder.empty()) {
+        cout << "Word ladder is empty." << endl;
+        return;
+    }
+}
+#define my_assert(e) {cout << #e << ((e) ? " passed": " failed") << endl;}
+void verify_word_ladder() {
+    set<string> word_list;
+    load_words(word_list, "words.txt");
+    my_assert(generate_word_ladder("cat", "dog", word_list).size() == 4);
+    my_assert(generate_word_ladder("marty", "curls", word_list).size() == 6);
+    my_assert(generate_word_ladder("code", "data", word_list).size() == 6);
+    my_assert(generate_word_ladder("work", "play", word_list).size() == 6);
+    my_assert(generate_word_ladder("sleep", "awake", word_list).size() == 8);
+    my_assert(generate_word_ladder("car", "cheat", word_list).size() == 4);
+}
