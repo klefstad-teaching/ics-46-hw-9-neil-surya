@@ -44,7 +44,6 @@ void print_path(const vector<int>& v, int total) {
         cout << "No path found!" << endl;
         return;
     }
-    cout << "Path: ";
     for (auto e: v)
         cout << e << " ";
     cout << endl;
