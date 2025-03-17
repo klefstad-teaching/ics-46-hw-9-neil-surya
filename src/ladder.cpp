@@ -26,7 +26,7 @@ bool is_adjacent(const string& word1, const string& word2) {
             if (word1[i] != word2[i]) ++diff_count;
             if (diff_count > 1) return false;
         }
-        return diff_count == 1;
+        return diff_count <= 1;
     }
 
     // diff length by 1
