@@ -10,6 +10,7 @@ using namespace std;
 vector<int> dijkstra_shortest_path(const Graph& G, int source, vector<int>& previous) {
     int n = G.size();
     vector<int> distance(n, INF);
+    previous.assign(n, -1);
     distance[source] = 0;
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
     pq.push({0, source});
@@ -33,11 +34,9 @@ vector<int> extract_shortest_path(const vector<int>& distances, const vector<int
     if (destination < 0 || destination >= distances.size() || distances[destination] == INF)
         return path;
     stack<int> s;
-    int max_iterations = distances.size();
-    int iterations = 0;
-    for (int v = destination; v != -1 && iterations < max_iterations; v = previous[v])
+    for (int v = destination; v != -1; v = previous[v])
         s.push(v);
-        ++iterations;
+        if (v == previous[v]) break;
     while (!s.empty()) {
         path.push_back(s.top());
         s.pop();
